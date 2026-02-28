@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "../docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.API", "backend\DDS.SimpleTaskManager.API\DDS.SimpleTaskManager.API.csproj", "{AA8B1766-C85D-D269-0177-FB71D9F208C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.API", "DDS.SimpleTaskManager.API\DDS.SimpleTaskManager.API.csproj", "{AA8B1766-C85D-D269-0177-FB71D9F208C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.Core", "backend\DDS.SimpleTaskManager.Core\DDS.SimpleTaskManager.Core.csproj", "{173116C0-BDD4-3AB5-5967-02C1A245DD81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.Core", "DDS.SimpleTaskManager.Core\DDS.SimpleTaskManager.Core.csproj", "{173116C0-BDD4-3AB5-5967-02C1A245DD81}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F57642F3-C37C-D174-720E-6A6AAD5BEE22}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.UnitTests", "backend\DDS.SimpleTaskManager.UnitTests\DDS.SimpleTaskManager.UnitTests.csproj", "{6A10C350-9412-51E3-8B5A-54AF97A82C26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.UnitTests", "DDS.SimpleTaskManager.UnitTests\DDS.SimpleTaskManager.UnitTests.csproj", "{6A10C350-9412-51E3-8B5A-54AF97A82C26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.IntegrationTests", "backend\DDS.SimpleTaskManager.IntegrationTests\DDS.SimpleTaskManager.IntegrationTests.csproj", "{FE674BE4-20C0-E030-73B2-EF9724185A6C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDS.SimpleTaskManager.IntegrationTests", "DDS.SimpleTaskManager.IntegrationTests\DDS.SimpleTaskManager.IntegrationTests.csproj", "{FE674BE4-20C0-E030-73B2-EF9724185A6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
