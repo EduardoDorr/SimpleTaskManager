@@ -1,6 +1,58 @@
-@DDS.SimpleTaskManager.API_HostAddress = http://localhost:5027
+@host = http://localhost:5027
+@taskId = 1
 
-GET {{DDS.SimpleTaskManager.API_HostAddress}}/weatherforecast/
+@page = 1
+@pageSize = 10
+@titleFilter = Task
+@statusFilter = Backlog
+@priorityFilter = Medium
+@isDescending = true
+@isActive = true
+
+@createTitle = Prepare technical assessment
+@createDescription = Build the frontend tasks page with MUI and React Query.
+@createPriority = High
+@createDueDate = 2026-03-15T00:00:00Z
+
+###
+# GET /api/v1/tasks/ (expected: 200)
+GET {{host}}/api/v1/tasks/?page={{page}}&pageSize={{pageSize}}&title={{titleFilter}}&status={{statusFilter}}&priority={{priorityFilter}}&isDescending={{isDescending}}&isActive={{isActive}}
 Accept: application/json
 
 ###
+# GET /api/v1/tasks/ (active only, no optional filters, expected: 200)
+GET {{host}}/api/v1/tasks/?page=1&pageSize=10&isActive=true
+Accept: application/json
+
+###
+# @name createTask
+# POST /api/v1/tasks/ (expected: 201)
+POST {{host}}/api/v1/tasks/
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "{{createTitle}}",
+  "description": "{{createDescription}}",
+  "priority": "{{createPriority}}",
+  "dueDate": "{{createDueDate}}"
+}
+
+###
+# Optional (if your HTTP client supports request variables):
+# @taskId = {{createTask.response.body.$.value}}
+
+###
+# PATCH /api/v1/tasks/{id}/status (expected: 204)
+PATCH {{host}}/api/v1/tasks/{{taskId}}/status
+Accept: application/json
+
+###
+# DELETE /api/v1/tasks/{id} (expected: 204)
+DELETE {{host}}/api/v1/tasks/{{taskId}}
+Accept: application/json
+
+###
+# PATCH with invalid id (expected: 404)
+PATCH {{host}}/api/v1/tasks/999999/status
+Accept: application/json
