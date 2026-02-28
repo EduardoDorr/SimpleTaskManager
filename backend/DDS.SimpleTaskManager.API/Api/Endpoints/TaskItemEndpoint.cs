@@ -28,6 +28,7 @@ public static class TaskItemEndpoint
             return result.ToApiResult().ToResult();
         })
         .Produces<ApiResult<PaginationResult<TaskItemViewModel>>>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapPost("/", async (
@@ -39,6 +40,7 @@ public static class TaskItemEndpoint
             return result.ToApiResult(System.Net.HttpStatusCode.Created).ToResult();
         })
         .Produces<ApiResult<long>>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status500InternalServerError);
 
         group.MapPatch("/{id}/status", async (
