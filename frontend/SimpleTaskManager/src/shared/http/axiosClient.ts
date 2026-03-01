@@ -9,3 +9,14 @@ export const axiosClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+function generateCorrelationId() {
+  return crypto.randomUUID().replace(/-/g, "");
+}
+
+axiosClient.interceptors.request.use((config) => {
+  config.headers = config.headers ?? {};
+  config.headers["X-Correlation-Id"] = generateCorrelationId();
+
+  return config;
+});
