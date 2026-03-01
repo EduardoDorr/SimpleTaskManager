@@ -9,6 +9,8 @@ using DDS.SimpleTaskManager.Core.Telemetry;
 
 using Microsoft.AspNetCore.Http.Json;
 
+using Serilog;
+
 using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
 
 namespace DDS.SimpleTaskManager.API.Api.Configuration;
@@ -33,12 +35,16 @@ public static class ApplicationConfiguration
 
         builder.Services.AddCors(options =>
         {
-            options.AddDefaultPolicy(
+            var allowedOrigins = builder.Configuration
+                .GetSection("Cors:AllowedOrigins")
+                .Get<string[]>() ?? [];
+
+            options.AddPolicy("Frontend",
                 policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.WithOrigins(allowedOrigins)
+                    .WithHeaders("Content-Type", "Authorization")
+                    .WithMethods("GET", "POST", "PATCH", "DELETE");
                 });
         });
 
@@ -60,13 +66,16 @@ public static class ApplicationConfiguration
             app.UseSwaggerUI();
         }
 
-        app.UseCors();
+        app.UseCors("Frontend");
+        app.UseMiddleware<CorrelationIdMiddleware>();
+        app.UseSerilogRequestLogging();
         app.UseHttpsRedirection();
         app.UseExceptionHandler();
 
         app.MapTaskItemEndpoints();
 
-        await app.EnsureMigrationsAsync();
+        if (app.Environment.IsDevelopment())
+            await app.EnsureMigrationsAsync();
 
         await app.RunAsync();
     }
