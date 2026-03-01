@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/test/renderWithProviders";
 import { TasksTable } from "./TasksTable";
@@ -15,7 +16,7 @@ vi.mock("@mui/x-data-grid", () => {
       columns: Array<{
         field: string;
         headerName: string;
-        renderCell?: (params: { row: Record<string, unknown> }) => unknown;
+        renderCell?: (params: { row: Record<string, unknown> }) => ReactNode;
       }>;
       onPaginationModelChange?: (value: { page: number; pageSize: number }) => void;
     }) => (
@@ -68,7 +69,7 @@ describe("TasksTable", () => {
             priority: "High",
             dueDate: "2099-12-31",
             createdAt: "2026-02-27T18:45:00.000Z",
-            updatedAt: null,
+            updatedAt: undefined,
             isActive: true,
           },
         ]}
@@ -104,7 +105,7 @@ describe("TasksTable", () => {
             priority: "High",
             dueDate: "2099-12-31",
             createdAt: "2026-02-27T18:45:00.000Z",
-            updatedAt: null,
+            updatedAt: undefined,
             isActive: true,
           },
         ]}
