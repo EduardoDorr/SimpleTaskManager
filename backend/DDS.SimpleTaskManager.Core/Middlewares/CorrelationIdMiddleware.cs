@@ -1,22 +1,26 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Http;
 
 using Serilog.Context;
 
 namespace DDS.SimpleTaskManager.Core.Middlewares;
 
-public sealed class CorrelationIdMiddleware
+public sealed partial class CorrelationIdMiddleware
 {
     public const string HeaderName = "X-Correlation-Id";
+    private static readonly Regex Allowed = AllowedCorrelationIdPattern();
     private readonly RequestDelegate _next;
 
     public CorrelationIdMiddleware(RequestDelegate next) => _next = next;
 
     public async Task Invoke(HttpContext context)
     {
+        var incoming = context.Request.Headers[HeaderName].ToString().Trim();
+
         var correlationId =
-            context.Request.Headers.TryGetValue(HeaderName, out var incoming) &&
-            !string.IsNullOrWhiteSpace(incoming)
-                ? incoming.ToString()
+            !string.IsNullOrWhiteSpace(incoming) && Allowed.IsMatch(incoming)
+                ? incoming
                 : Guid.NewGuid().ToString("N");
 
         context.TraceIdentifier = correlationId;
@@ -27,4 +31,7 @@ public sealed class CorrelationIdMiddleware
             await _next(context);
         }
     }
+
+    [GeneratedRegex("^[A-Za-z0-9._:-]{1,64}$")]
+    private static partial Regex AllowedCorrelationIdPattern();
 }
