@@ -30,7 +30,7 @@ Current task capabilities:
 Base route: `/api/v1/tasks`
 
 1. `GET /`
-- Returns `200 OK` with paginated tasks.
+- Returns `200 OK` with paginated tasks in `value` payload.
 - Query params:
   - `page` (must be `> 0`)
   - `pageSize` (must be `> 0` and `<= 1000`)
@@ -42,7 +42,7 @@ Base route: `/api/v1/tasks`
 
 2. `POST /`
 - Creates a new task.
-- Returns `201 Created` with `id`.
+- Returns `201 Created` with `id` in `value` payload.
 - Body:
   - `title`
   - `description` (optional)
