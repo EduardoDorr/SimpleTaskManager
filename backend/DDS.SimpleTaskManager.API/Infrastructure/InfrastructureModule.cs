@@ -37,7 +37,8 @@ public static class InfrastructureModule
         services.AddDbContext<TaskManagerDbContext>(options =>
             options.UseMySQL(
                 connectionString)
-            .AddInterceptors(new HardDeletePreventionInterceptor()));
+            .AddInterceptors(new HardDeletePreventionInterceptor())
+            .AddInterceptors(new UpdateAuditableInterceptor()));
 
         return services;
     }
