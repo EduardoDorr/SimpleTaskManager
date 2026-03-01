@@ -40,7 +40,7 @@ export function TasksFiltersCard({
               gridTemplateColumns: {
                 xs: "1fr",
                 md: "repeat(2, minmax(0, 1fr))",
-                lg: "minmax(280px, 2fr) repeat(4, minmax(140px, 1fr))",
+                lg: "minmax(280px, 2fr) repeat(5, minmax(140px, 1fr))",
               },
               rowGap: 2,
             }}
@@ -83,19 +83,6 @@ export function TasksFiltersCard({
 
             <TextField
               fullWidth
-              label="Visibility"
-              onChange={(event) => onFieldChange("isActive", event.target.value as TasksFilterDraft["isActive"])}
-              select
-              size="small"
-              value={draft.isActive}
-            >
-              <MenuItem value="true">Active only</MenuItem>
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="false">Inactive only</MenuItem>
-            </TextField>
-
-            <TextField
-              fullWidth
               label="Sort"
               onChange={(event) => onFieldChange("isDescending", event.target.value === "true")}
               select
@@ -105,20 +92,22 @@ export function TasksFiltersCard({
               <MenuItem value="true">Newest first</MenuItem>
               <MenuItem value="false">Oldest first</MenuItem>
             </TextField>
-          </Box>
 
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            justifyContent="flex-end"
-            spacing={1.5}
-          >
-            <Button disabled={loading || !hasActiveFilters} onClick={onClear} variant="outlined">
+            <Button
+              disabled={loading || !hasActiveFilters}
+              onClick={onClear}
+              variant="outlined"
+            >
               Clear
             </Button>
-            <Button disabled={loading} onClick={onSearch} variant="contained">
+            <Button
+              disabled={loading}
+              onClick={onSearch}
+              variant="contained"
+            >
               Search
             </Button>
-          </Stack>
+          </Box>
         </Stack>
       </CardContent>
     </Card>
