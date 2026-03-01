@@ -1,39 +1,37 @@
 # DDS.SimpleTaskManager
 
-## Overview
-`DDS.SimpleTaskManager` is a full-stack task management solution built for a technical assessment.
+## Project And Objective
+`DDS.SimpleTaskManager` is a full-stack solution built for a technical assessment.
 
-Current delivery includes:
-- Backend API with domain-driven task rules and consistent API envelope responses.
-- Frontend application with a Feature-First architecture and shared reusable UI components.
+The objective is to deliver a clean, production-minded implementation of task management with:
+- task creation
+- task listing
+- task status toggle
+- frontend/backend communication with predictable contracts
 
-The system currently focuses on a simple and robust task lifecycle (`Backlog` and `Completed`) while keeping the architecture ready for the next phase of expansion.
-
-The future roadmap is already modeled in [doc/SimpleTaskManager.drawio](doc/SimpleTaskManager.drawio):
-- **Phase 2:** Users, Projects and Authentication
-- **Phase 3:** Domain Events and Notification Module
-
-## What The API Does Today (Phase 1)
-Backend stack:
+## Current Delivery (Phase 1 - Implemented)
+### Backend
 - .NET 9 Minimal API
 - EF Core + MySQL
-- Result pattern + `ApiResult` response envelope
-- Domain validation in `TaskItem`
+- Domain rules inside `TaskItem`
+- Consistent response envelope using `Result` + `ApiResult`
+- Pagination, filters and soft delete
 
-Current task capabilities:
-- List tasks with pagination and filters
-- Create task
-- Change task status (toggle)
-- Soft delete task
+### Frontend
+- React + TypeScript + Vite
+- MUI + React Query + Axios
+- Feature-First module organization (`features/tasks`, `shared`)
+- Tasks table with status toggle through a checkbox control
+- Unit/component test suite with Vitest + Testing Library
 
-### Endpoints
+### Implemented API Endpoints
 Base route: `/api/v1/tasks`
 
 1. `GET /`
-- Returns `200 OK` with paginated tasks in `value` payload.
+- Returns `200 OK` with paginated tasks in `value`.
 - Query params:
-  - `page` (must be `> 0`)
-  - `pageSize` (must be `> 0` and `<= 1000`)
+  - `page` (`> 0`)
+  - `pageSize` (`> 0` and `<= 1000`)
   - `title`
   - `status`
   - `priority`
@@ -41,89 +39,101 @@ Base route: `/api/v1/tasks`
   - `isActive`
 
 2. `POST /`
-- Creates a new task.
-- Returns `201 Created` with `id` in `value` payload.
+- Creates a task.
+- Returns `201 Created` with `id` in `value`.
 - Body:
   - `title`
   - `description` (optional)
   - `priority`
   - `dueDate`
 
-1. `PATCH /{id}/status`
-- Changes task status according to current phase rules.
-- Returns `200 OK` with no `value` payload.
+3. `PATCH /{id}/status`
+- Toggles task status.
+- Returns `200 OK`.
 
-1. `DELETE /{id}`
+4. `DELETE /{id}`
 - Soft deletes task (`IsDeleted = true`).
-- Returns `200 OK` with no `value` payload.
+- Returns `200 OK`.
 
 ### Response Contract
-API responses follow `ApiResult`:
+All API responses use `ApiResult`:
 - `success`
 - `status`
 - `errors`
 - `infos`
 - `value` (when applicable)
 
-## Current Status Model
-Current implemented statuses:
-- `Backlog`
-- `Completed`
+## Assumptions, Inferences And Trade-Offs
+### Why MySQL instead of SQLite?
+The decision was practical. MySQL is a real relational database, easy to run via Docker, license-free for this scope, and simple to provision with the API in one compose file.
 
-Current behavior:
-- Status can toggle between `Backlog` and `Completed`.
+Trade-off accepted: slightly higher operational setup than SQLite, in exchange for a more production-like environment.
 
-## Planned Phase 2 Status Expansion
-The domain was intentionally prepared to expand to a 4-state workflow with explicit transition rules:
+### Why `Result` + `ApiResult` instead of only `ProblemDetails`?
+Using only `ProblemDetails` usually means one shape for errors and another for success responses.
 
-Target statuses:
-- `Backlog`
-- `InProgress`
-- `Completed`
-- `Canceled`
+With `ApiResult`, the contract is always the same. Clients can consistently:
+- check `success`
+- consume domain error codes/messages
+- map error codes to client-specific messages if needed
 
-Allowed transitions:
-- `Backlog -> InProgress`
-- `Backlog -> Canceled`
-- `InProgress -> Completed`
-- `InProgress -> Canceled`
+Trade-off accepted: less adherence to default RFC-style error-only shape, in exchange for a single, predictable API envelope.
 
-This phase will also introduce:
-- `User` entity
-- `Project` entity
-- Authentication
-- Authorization and permission model
+### Why include soft delete, filters and pagination?
+The goal was to demonstrate engineering standards beyond the bare minimum.
 
-## Frontend Architecture (Phase 1)
-Frontend stack:
-- React + TypeScript + Vite
-- MUI (Material UI)
-- React Query
-- Axios
+- Soft delete preserves historical data.
+- Pagination avoids large payloads as data grows.
+- Filters improve usability and reduce unnecessary traffic.
 
-The frontend is modeled using a **Feature-First** approach:
-- Features are isolated by domain (`features/tasks`).
-- Shared UI and infra live in `shared/` (layout, dialogs, HTTP, constants).
-- This structure improves maintainability and makes new features easier to add without impacting existing modules.
+### Where could this be simplified without losing core challenge features?
+Possible simplifications:
+- remove pagination
+- remove filters
+- remove audit fields (`CreatedAt`, `UpdatedAt`)
+- remove `dueDate`
+- remove soft delete
+- remove EF interceptors related to audit/delete
 
-### Why Feature-First Here
-- Better isolation of business contexts.
-- Easier scaling when new modules are introduced.
-- Lower coupling between pages and shared infrastructure.
-- Faster onboarding for reviewers/interviewers because responsibilities are explicit.
+This would reduce complexity and data footprint while keeping create/list/toggle.
 
-## Project Structure
-- `backend/DDS.SimpleTaskManager.API`
-  - Endpoints
-  - Application handlers
-  - Domain (`TaskItem`)
-  - Infrastructure (EF Core, repository, migrations)
-- `backend/DDS.SimpleTaskManager.Core`
-  - Shared primitives (`Result`, errors, pagination, middleware, telemetry, etc.)
-- `frontend/SimpleTaskManager`
-  - `app/` bootstrapping, routes, theme
-  - `features/tasks/` task feature modules
-  - `shared/` reusable components, HTTP layer, layout
+## Phase 1 Design Choices That Already Support Scale
+Even in Phase 1, the solution was structured to support growth:
+- feature isolation in frontend (`Feature-First`)
+- clear backend boundaries (API/Application/Domain/Infrastructure)
+- consistent result handling and centralized error contract
+- reusable cross-cutting infrastructure (interceptors, middleware, pagination primitives)
+- task status model designed to evolve from 2-state to richer workflows
+
+## Next Steps (Planned Phases)
+Roadmap is documented in [doc/SimpleTaskManager.drawio](doc/SimpleTaskManager.drawio), with tabs explicitly marked as:
+- `Phase 1: Core (Implemented)`
+- `Phase 2: Projects and Users (Planned)`
+- `Phase 3: Notifications (Planned)`
+
+### Phase 2 (Planned)
+- Users
+- Projects
+- Authentication/authorization with JWT transported via secure cookies (`HttpOnly`, `Secure`, `SameSite`) to reduce token exposure in browser JavaScript and mitigate CSRF risk
+- Expanded task workflow:
+  - `Backlog -> InProgress`
+  - `Backlog -> Canceled`
+  - `InProgress -> Completed`
+  - `InProgress -> Canceled`
+- Status update API evolution to support explicit state transitions:
+  - current `PATCH /api/v1/tasks/{id}/status` is toggle-based
+  - new versioned contract in `v2` should receive the target status in request body (breaking-change-safe evolution path)
+
+Domain modeling for this phase includes Value Objects (for example `Cpf`, `Address`) to keep validation localized, reusable and consistent.
+
+### Phase 3 (Planned)
+- Domain events + notifications module
+- Outbox pattern for reliable event publication
+- Asynchronous messaging backbone (for example RabbitMQ, Azure Service Bus or AWS SQS)
+- Full observability maturity:
+  - structured logs
+  - distributed tracing
+  - metrics and dashboards
 
 ## Prerequisites
 - .NET SDK `9.x`
@@ -133,6 +143,19 @@ The frontend is modeled using a **Feature-First** approach:
 
 ## Run Locally
 ### Option A: Full stack with Docker Compose
+Before running Docker Compose, create a `.env` file at the repository root with the required variables:
+
+- `MYSQL_ROOT_PASSWORD=root`
+- `MYSQL_DATABASE=TaskManagerDB`
+- `MYSQL_USER=admin`
+- `MYSQL_PASSWORD=Admin123?`
+- `ASPNETCORE_ENVIRONMENT=Development`
+- `API_PORT=8080`
+- `FRONTEND_PORT=5173`
+- `DB_PORT=3307`
+- `VITE_API_BASE_URL=http://localhost:8080`
+
+
 ```powershell
 docker compose up -d --build
 ```
@@ -142,8 +165,30 @@ Expected services:
 - Frontend: `http://localhost:5173`
 
 ### Option B: Backend + Frontend separately
+For this option, a MySQL instance is still required. You can start it with Docker Compose or with a direct `docker run` command.
+
+Using Docker Compose (recommended):
+
+```powershell
+docker compose up -d taskmanagerdb
+```
+
+Using `docker run`:
+
+```bash
+docker run \
+  -d --name taskmanagerdb-local \
+  -p 3307:3306 \
+  -e MYSQL_ROOT_PASSWORD=root \
+  -e MYSQL_DATABASE=TaskManagerDB \
+  -e MYSQL_USER=admin \
+  -e MYSQL_PASSWORD=Admin123? \
+  mysql:8.0.41
+```
+
 Backend:
 ```powershell
+$env:ConnectionStrings__TaskManagerDbConnection="Server=localhost;Port=3307;Database=TaskManagerDB;Uid=admin;Pwd=Admin123?;AllowPublicKeyRetrieval=True;"
 dotnet run --project backend/DDS.SimpleTaskManager.API/DDS.SimpleTaskManager.API.csproj
 ```
 
@@ -156,6 +201,8 @@ npm run dev
 
 ## Testing
 Backend tests:
+The backend test suite includes integration tests with MySQL Testcontainers, so Docker must be running.
+
 ```powershell
 dotnet test backend/DDS.SimpleTaskManager.sln --no-restore
 ```
@@ -178,11 +225,15 @@ cd frontend/SimpleTaskManager
 npm run test:coverage
 ```
 
-## Notes For Reviewers
-This submission prioritizes:
-- Clean architecture and separation of concerns
-- Explicit domain rules
-- Consistent API contract handling
-- A frontend structure ready for incremental growth
-
-The roadmap already includes phase-based evolution for richer status flow, user/project ownership, and access control.
+## Project Structure
+- `backend/DDS.SimpleTaskManager.API`
+  - Endpoints
+  - Application handlers
+  - Domain (`TaskItem`)
+  - Infrastructure (EF Core, repositories, migrations)
+- `backend/DDS.SimpleTaskManager.Core`
+  - Shared primitives (`Result`, errors, pagination, middleware, telemetry, etc.)
+- `frontend/SimpleTaskManager`
+  - `app/` bootstrap, routes, theme
+  - `features/tasks/` feature modules
+  - `shared/` reusable components, HTTP layer, layout
