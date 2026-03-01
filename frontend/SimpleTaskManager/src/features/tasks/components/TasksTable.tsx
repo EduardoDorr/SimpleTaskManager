@@ -1,7 +1,7 @@
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
-import { Box, Chip, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Chip, IconButton, Paper, Stack, Tooltip } from "@mui/material";
 import { DataGrid, type GridColDef, type GridPaginationModel } from "@mui/x-data-grid";
 import { formatDate, formatDateTime } from "@/shared/utils/dateFormat";
 import { surfaceCardSx } from "@/shared/styles/surfaceCards";
@@ -54,11 +54,9 @@ export function TasksTable({
       minWidth: 220,
       flex: 1.4,
       renderCell: (params) => (
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Typography color="text.secondary" noWrap variant="body2">
-            {params.row.description || "-"}
-          </Typography>
-        </div>
+        <>
+          {params.row.description || "-"}
+        </>
       ),
     },
     {
