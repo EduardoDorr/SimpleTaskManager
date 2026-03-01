@@ -1,6 +1,7 @@
 ﻿using DDS.SimpleTaskManager.API.Domain.TaskItems;
 using DDS.SimpleTaskManager.Core.Persistence.Configurations;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DDS.SimpleTaskManager.API.Infrastructure.Persistence.Configurations;
@@ -33,6 +34,7 @@ internal class TaskItemConfiguration : BaseEntityConfiguration<TaskItem>
         builder.HasIndex(ti => ti.Priority);
 
         builder.Property(ti => ti.DueDate)
+               .HasColumnType("datetime(3)")
                .IsRequired();
     }
 }

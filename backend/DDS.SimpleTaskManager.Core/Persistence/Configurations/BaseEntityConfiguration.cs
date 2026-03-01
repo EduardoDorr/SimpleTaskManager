@@ -24,10 +24,12 @@ public abstract class BaseEntityConfiguration<TBase> : IEntityTypeConfiguration<
         builder.HasQueryFilter(b => !b.IsDeleted);
 
         builder.Property(b => b.CreatedAt)
+               .HasColumnType("timestamp(3)")
                .IsRequired();
 
         builder.HasIndex(b => b.CreatedAt);
 
-        builder.Property(b => b.UpdatedAt);
+        builder.Property(b => b.UpdatedAt)
+               .HasColumnType("timestamp(3)");
     }
 }

@@ -25,9 +25,9 @@ namespace DDS.SimpleTaskManager.API.Migrations
                     Description = table.Column<string>(type: "varchar(250)", maxLength: 250, nullable: true),
                     Status = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Priority = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    DueDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    DueDate = table.Column<DateTime>(type: "datetime(3)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp(3)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp(3)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
