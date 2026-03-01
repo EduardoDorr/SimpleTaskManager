@@ -3,21 +3,21 @@ using DDS.SimpleTaskManager.Core.CommandQueries;
 using DDS.SimpleTaskManager.Core.Persistence.UnitOfWork;
 using DDS.SimpleTaskManager.Core.Results.Base;
 
-namespace DDS.SimpleTaskManager.API.Application.TaskItems.ChangeStatusTaskItem;
+namespace DDS.SimpleTaskManager.API.Application.TaskItems.DeleteTaskItem;
 
-public interface IChangeStatusTaskItemCommandHandler
-    : IRequestHandler<ChangeStatusTaskItemCommand, Result>
+public interface IDeleteTaskItemCommandHandler
+    : IRequestHandler<DeleteTaskItemCommand, Result>
 { }
 
-public class ChangeStatusTaskItemCommandHandler
-    : BaseRequestHandler<ChangeStatusTaskItemCommandHandler, ChangeStatusTaskItemCommand, Result>,
-    IChangeStatusTaskItemCommandHandler
+public class DeleteTaskItemCommandHandler
+    : BaseRequestHandler<DeleteTaskItemCommandHandler, DeleteTaskItemCommand, Result>,
+    IDeleteTaskItemCommandHandler
 {
     private readonly ITaskItemRepository _taskItemRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ChangeStatusTaskItemCommandHandler(
-        ILogger<ChangeStatusTaskItemCommandHandler> logger,
+    public DeleteTaskItemCommandHandler(
+        ILogger<DeleteTaskItemCommandHandler> logger,
         ITaskItemRepository taskItemRepository,
         IUnitOfWork unitOfWork) : base(logger)
     {
@@ -25,7 +25,7 @@ public class ChangeStatusTaskItemCommandHandler
         _unitOfWork = unitOfWork;
     }
 
-    protected override async Task<Result> ExecuteAsync(ChangeStatusTaskItemCommand request, CancellationToken cancellationToken = default)
+    protected override async Task<Result> ExecuteAsync(DeleteTaskItemCommand request, CancellationToken cancellationToken = default)
     {
         var taskItem =
             await _taskItemRepository
@@ -42,7 +42,7 @@ public class ChangeStatusTaskItemCommandHandler
             return Result.Fail(TaskItemError.NotFound(request.Id));
         }
 
-        taskItem.ToggleCompletion();
+        taskItem.Delete();
 
         _taskItemRepository.Update(taskItem);
         var rowsAffected = await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -50,16 +50,16 @@ public class ChangeStatusTaskItemCommandHandler
         if (rowsAffected <= 0)
         {
             _logger.LogError(
-                "ChangeStatusTask persistence failed. RowsAffected={RowsAffected}",
+                "DeleteTask persistence failed. RowsAffected={RowsAffected}",
                 rowsAffected);
 
-            return Result.Fail(TaskItemError.UpdateFailed(request.Id));
+            return Result.Fail(TaskItemError.DeleteFailed(request.Id));
         }
 
         _logger.LogInformation(
-            "Task changed status. TaskId={TaskId} NewStatus={Status} DueDate={DueDate}",
+            "Task deleted. TaskId={TaskId} Priority={Priority} DueDate={DueDate}",
             taskItem.Id,
-            taskItem.Status,
+            taskItem.Priority,
             taskItem.DueDate);
 
         return Result.Ok();

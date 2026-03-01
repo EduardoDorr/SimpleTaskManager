@@ -10,6 +10,8 @@ using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 using ValidationResult = FluentValidation.Results.ValidationResult;
@@ -18,6 +20,7 @@ namespace DDS.SimpleTaskManager.UnitTests.Application.TaskItems.GetTaskItems;
 
 public class GetTaskItemsQueryHandlerTests : BaseTest
 {
+    private readonly Mock<ILogger<GetTaskItemsQueryHandler>> _loggerMock = new();
     private readonly Mock<ITaskItemRepository> _repositoryMock = new();
     private readonly Mock<IValidator<GetTaskItemsQuery>> _validatorMock = new();
 
@@ -26,6 +29,7 @@ public class GetTaskItemsQueryHandlerTests : BaseTest
     public GetTaskItemsQueryHandlerTests()
     {
         _handler = new GetTaskItemsQueryHandler(
+            _loggerMock.Object,
             _repositoryMock.Object,
             _validatorMock.Object);
     }

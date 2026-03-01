@@ -1,26 +1,30 @@
 using Bogus;
 
-using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
+using DDS.SimpleTaskManager.API.Application.TaskItems.DeleteTaskItem;
 using DDS.SimpleTaskManager.API.Domain.TaskItems;
 using DDS.SimpleTaskManager.Core.Enums;
 using DDS.SimpleTaskManager.Core.Persistence.UnitOfWork;
 
 using FluentAssertions;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
-namespace DDS.SimpleTaskManager.UnitTests.Application.TaskItems.CancelTaskItem;
+namespace DDS.SimpleTaskManager.UnitTests.Application.TaskItems.DeleteTaskItem;
 
-public class CancelTaskItemCommandHandlerTests : BaseTest
+public class DeleteTaskItemCommandHandlerTests : BaseTest
 {
+    private readonly Mock<ILogger<DeleteTaskItemCommandHandler>> _loggerMock = new();
     private readonly Mock<ITaskItemRepository> _repositoryMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
-    private readonly CancelTaskItemCommandHandler _handler;
+    private readonly DeleteTaskItemCommandHandler _handler;
 
-    public CancelTaskItemCommandHandlerTests()
+    public DeleteTaskItemCommandHandlerTests()
     {
-        _handler = new CancelTaskItemCommandHandler(
+        _handler = new DeleteTaskItemCommandHandler(
+            _loggerMock.Object,
             _repositoryMock.Object,
             _unitOfWorkMock.Object);
     }
@@ -30,7 +34,7 @@ public class CancelTaskItemCommandHandlerTests : BaseTest
     {
         // Arrange
         var cancellationToken = CancellationToken.None;
-        
+
         _repositoryMock.Setup(r => r.GetByIdAsync(31, It.IsAny<CancellationToken>()))
             .ReturnsAsync((TaskItem?)null)
             .Verifiable(Times.Once);
@@ -42,12 +46,12 @@ public class CancelTaskItemCommandHandlerTests : BaseTest
             .Verifiable(Times.Never);
 
         // Act
-        var result = await _handler.HandleAsync(new CancelTaskItemCommand(31), cancellationToken);
+        var result = await _handler.HandleAsync(new DeleteTaskItemCommand(31), cancellationToken);
 
         // Assert
         result.Success.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.Code == "TaskItem.NotFound");
-        
+
         _repositoryMock.Verify(r => r.Update(It.IsAny<TaskItem>()), Times.Never);
         _unitOfWorkMock.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -71,7 +75,7 @@ public class CancelTaskItemCommandHandlerTests : BaseTest
             .Verifiable(Times.Once);
 
         // Act
-        var result = await _handler.HandleAsync(new CancelTaskItemCommand(20), cancellationToken);
+        var result = await _handler.HandleAsync(new DeleteTaskItemCommand(20), cancellationToken);
 
         // Assert
         result.Success.Should().BeTrue();
@@ -101,7 +105,7 @@ public class CancelTaskItemCommandHandlerTests : BaseTest
             .Verifiable(Times.Once);
 
         // Act
-        var result = await _handler.HandleAsync(new CancelTaskItemCommand(20), cancellationToken);
+        var result = await _handler.HandleAsync(new DeleteTaskItemCommand(20), cancellationToken);
 
         // Assert
         result.Success.Should().BeFalse();

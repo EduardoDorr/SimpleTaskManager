@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.ChangeStatusTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.CreateTaskItem;
+using DDS.SimpleTaskManager.API.Application.TaskItems.DeleteTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.GetTaskItems;
 
 using FluentValidation;
@@ -25,7 +25,7 @@ public static class ApplicationModule
         services.AddScoped<IGetTaskItemsQueryHandler, GetTaskItemsQueryHandler>();
         services.AddScoped<ICreateTaskItemCommandHandler, CreateTaskItemCommandHandler>();
         services.AddScoped<IChangeStatusTaskItemCommandHandler, ChangeStatusTaskItemCommandHandler>();
-        services.AddScoped<ICancelTaskItemCommandHandler, CancelTaskItemCommandHandler>();
+        services.AddScoped<IDeleteTaskItemCommandHandler, DeleteTaskItemCommandHandler>();
 
         return services;
     }

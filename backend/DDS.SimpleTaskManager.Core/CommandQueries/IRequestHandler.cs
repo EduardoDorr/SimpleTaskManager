@@ -1,4 +1,4 @@
-﻿namespace DDS.SimpleTaskManager.Core.Interfaces;
+﻿namespace DDS.SimpleTaskManager.Core.CommandQueries;
 
 public interface IRequestHandler<in TRequest, TResult>
     where TRequest : notnull

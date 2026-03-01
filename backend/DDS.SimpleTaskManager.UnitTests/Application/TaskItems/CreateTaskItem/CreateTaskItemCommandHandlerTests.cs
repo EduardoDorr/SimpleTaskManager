@@ -7,12 +7,15 @@ using DDS.SimpleTaskManager.Core.Persistence.UnitOfWork;
 
 using FluentAssertions;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 namespace DDS.SimpleTaskManager.UnitTests.Application.TaskItems.CreateTaskItem;
 
 public class CreateTaskItemCommandHandlerTests : BaseTest
 {
+    private readonly Mock<ILogger<CreateTaskItemCommandHandler>> _loggerMock = new();
     private readonly Mock<ITaskItemRepository> _repositoryMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
@@ -21,6 +24,7 @@ public class CreateTaskItemCommandHandlerTests : BaseTest
     public CreateTaskItemCommandHandlerTests()
     {
         _handler = new CreateTaskItemCommandHandler(
+            _loggerMock.Object,
             _repositoryMock.Object,
             _unitOfWorkMock.Object);
     }

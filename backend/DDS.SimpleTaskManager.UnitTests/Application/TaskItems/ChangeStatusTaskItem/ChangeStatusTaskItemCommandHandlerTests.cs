@@ -7,12 +7,15 @@ using DDS.SimpleTaskManager.Core.Persistence.UnitOfWork;
 
 using FluentAssertions;
 
+using Microsoft.Extensions.Logging;
+
 using Moq;
 
 namespace DDS.SimpleTaskManager.UnitTests.Application.TaskItems.ChangeStatusTaskItem;
 
 public class ChangeStatusTaskItemCommandHandlerTests : BaseTest
 {
+    private readonly Mock<ILogger<ChangeStatusTaskItemCommandHandler>> _loggerMock = new();
     private readonly Mock<ITaskItemRepository> _repositoryMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
@@ -21,6 +24,7 @@ public class ChangeStatusTaskItemCommandHandlerTests : BaseTest
     public ChangeStatusTaskItemCommandHandlerTests()
     {
         _handler = new ChangeStatusTaskItemCommandHandler(
+            _loggerMock.Object,
             _repositoryMock.Object,
             _unitOfWorkMock.Object);
     }
@@ -47,7 +51,7 @@ public class ChangeStatusTaskItemCommandHandlerTests : BaseTest
         // Assert
         result.Success.Should().BeFalse();
         result.Errors.Should().ContainSingle(e => e.Code == "TaskItem.NotFound");
-        
+
         _repositoryMock.VerifyAll();
         _unitOfWorkMock.VerifyAll();
     }
@@ -76,7 +80,7 @@ public class ChangeStatusTaskItemCommandHandlerTests : BaseTest
         // Assert
         result.Success.Should().BeTrue();
         taskItem.Status.Should().Be(TaskItemStatus.Completed);
-        
+
         _repositoryMock.VerifyAll();
         _unitOfWorkMock.VerifyAll();
     }

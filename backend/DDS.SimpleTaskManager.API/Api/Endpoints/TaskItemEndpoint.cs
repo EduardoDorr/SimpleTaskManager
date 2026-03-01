@@ -1,8 +1,8 @@
 ﻿using System.Net;
 
-using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.ChangeStatusTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.CreateTaskItem;
+using DDS.SimpleTaskManager.API.Application.TaskItems.DeleteTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.GetTaskItems;
 using DDS.SimpleTaskManager.API.Application.TaskItems.Models;
 using DDS.SimpleTaskManager.API.Domain.TaskItems;
@@ -59,7 +59,7 @@ public static class TaskItemEndpoint
 
         group.MapDelete("/{id}", async (
             long id,
-            ICancelTaskItemCommandHandler service,
+            IDeleteTaskItemCommandHandler service,
             CancellationToken cancellationToken) =>
         {
             var result = await service.HandleAsync(new(id), cancellationToken);

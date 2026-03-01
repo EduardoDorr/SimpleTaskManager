@@ -1,6 +1,6 @@
 ﻿using DDS.SimpleTaskManager.API.Application.TaskItems.Models;
 using DDS.SimpleTaskManager.API.Domain.TaskItems;
-using DDS.SimpleTaskManager.Core.Interfaces;
+using DDS.SimpleTaskManager.Core.CommandQueries;
 using DDS.SimpleTaskManager.Core.Models.Pagination;
 using DDS.SimpleTaskManager.Core.Results.Base;
 using DDS.SimpleTaskManager.Core.Results.FluentValidation;
@@ -13,24 +13,34 @@ public interface IGetTaskItemsQueryHandler
     : IRequestHandler<GetTaskItemsQuery, Result<PaginationResult<TaskItemViewModel>>>
 { }
 
-public class GetTaskItemsQueryHandler : IGetTaskItemsQueryHandler
+public class GetTaskItemsQueryHandler
+    : BaseRequestHandler<GetTaskItemsQueryHandler, GetTaskItemsQuery, Result<PaginationResult<TaskItemViewModel>>>,
+    IGetTaskItemsQueryHandler
 {
     private readonly ITaskItemRepository _taskItemRepository;
     private readonly IValidator<GetTaskItemsQuery> _validator;
 
     public GetTaskItemsQueryHandler(
+        ILogger<GetTaskItemsQueryHandler> logger,
         ITaskItemRepository taskItemRepository,
-        IValidator<GetTaskItemsQuery> validator)
+        IValidator<GetTaskItemsQuery> validator) : base(logger)
     {
         _taskItemRepository = taskItemRepository;
         _validator = validator;
     }
 
-    public async Task<Result<PaginationResult<TaskItemViewModel>>> HandleAsync(GetTaskItemsQuery request, CancellationToken cancellationToken = default)
+    protected override async Task<Result<PaginationResult<TaskItemViewModel>>> ExecuteAsync(GetTaskItemsQuery request, CancellationToken cancellationToken = default)
     {
         var validation = await _validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
-            return Result.Fail<PaginationResult<TaskItemViewModel>>(validation.ToErrors());
+        {
+            var errors = validation.ToErrors();
+            _logger.LogWarning(
+                "QueryFilter has errors. ErrorCodes={ErrorCodes}",
+                errors.Select(e => e.Code));
+
+            return Result.Fail<PaginationResult<TaskItemViewModel>>(errors);
+        }
 
         var taskItems =
             await _taskItemRepository
@@ -41,6 +51,13 @@ public class GetTaskItemsQueryHandler : IGetTaskItemsQueryHandler
         var paginatedTaskItems =
             taskItems
                 .Map(taskItems.Data.ToModel().ToList());
+
+        _logger.LogInformation(
+            "Tasks retrieved. Page={Page} PageSize={PageSize} IsDescending={IsDescending} IsActive={IsActive}",
+            request.QueryFilter.Page,
+            request.QueryFilter.PageSize,
+            request.QueryFilter.IsDescending,
+            request.QueryFilter.IsActive);
 
         return Result.Ok(paginatedTaskItems);
     }

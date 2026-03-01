@@ -1,8 +1,8 @@
 using Bogus;
 
-using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.ChangeStatusTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.CreateTaskItem;
+using DDS.SimpleTaskManager.API.Application.TaskItems.DeleteTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.GetTaskItems;
 using DDS.SimpleTaskManager.API.Domain.TaskItems;
 using DDS.SimpleTaskManager.API.Infrastructure.Persistence;
@@ -12,6 +12,10 @@ using DDS.SimpleTaskManager.Core.Persistence.UnitOfWork;
 using DDS.SimpleTaskManager.IntegrationTests.Infrastructure;
 
 using FluentAssertions;
+
+using Microsoft.Extensions.Logging;
+
+using Moq;
 
 namespace DDS.SimpleTaskManager.IntegrationTests.TaskItems;
 
@@ -27,7 +31,7 @@ public sealed class TaskItemUseCasesIntegrationTests : IClassFixture<MySqlTaskMa
     }
 
     [Fact]
-    public async Task CreateAndGetAndChangeStatusAndCancel_ShouldPersistAndReturn()
+    public async Task CreateAndGetAndChangeStatusAndDelete_ShouldPersistAndReturn()
     {
         // Arrange
         await _fixture.ResetDatabaseAsync();
@@ -46,13 +50,14 @@ public sealed class TaskItemUseCasesIntegrationTests : IClassFixture<MySqlTaskMa
 
         await ChangeStatusOperation(createdId, unitOfWork, repository);
 
-        await CancelOperation(createdId, unitOfWork, repository);
+        await DeleteOperation(createdId, unitOfWork, repository);
     }
 
     private static async Task<long> CreateOperation(UnitOfWork<TaskManagerDbContext> unitOfWork, TaskItemRepository repository, CreateTaskItemCommand createCommand)
     {
         // Arrange
-        var createHandler = new CreateTaskItemCommandHandler(repository, unitOfWork);
+        var logger = new Mock<ILogger<CreateTaskItemCommandHandler>>();
+        var createHandler = new CreateTaskItemCommandHandler(logger.Object, repository, unitOfWork);
 
         // Act
         var createResult = await createHandler.HandleAsync(createCommand);
@@ -67,7 +72,8 @@ public sealed class TaskItemUseCasesIntegrationTests : IClassFixture<MySqlTaskMa
     private static async Task GetAllOperation(long createdId, TaskItemRepository repository, CreateTaskItemCommand createCommand)
     {
         // Arrange
-        var getHandler = new GetTaskItemsQueryHandler(repository, new GetTaskItemsQueryValidator());
+        var logger = new Mock<ILogger<GetTaskItemsQueryHandler>>();
+        var getHandler = new GetTaskItemsQueryHandler(logger.Object, repository, new GetTaskItemsQueryValidator());
         var query = new GetTaskItemsQuery(new TaskItemQueryFilter(Page: 1, PageSize: 10));
 
         // Act
@@ -81,13 +87,14 @@ public sealed class TaskItemUseCasesIntegrationTests : IClassFixture<MySqlTaskMa
             item.Title == createCommand.Title.Trim());
     }
 
-    private static async Task CancelOperation(long createdId, UnitOfWork<TaskManagerDbContext> unitOfWork, TaskItemRepository repository)
+    private static async Task DeleteOperation(long createdId, UnitOfWork<TaskManagerDbContext> unitOfWork, TaskItemRepository repository)
     {
         // Arrange
-        var cancelHandler = new CancelTaskItemCommandHandler(repository, unitOfWork);
+        var logger = new Mock<ILogger<DeleteTaskItemCommandHandler>>();
+        var cancelHandler = new DeleteTaskItemCommandHandler(logger.Object, repository, unitOfWork);
 
         // Act
-        var cancelResult = await cancelHandler.HandleAsync(new CancelTaskItemCommand(createdId));
+        var cancelResult = await cancelHandler.HandleAsync(new DeleteTaskItemCommand(createdId));
         var canceledTask = await repository.GetByIdAsync(createdId);
 
         // Assert
@@ -98,7 +105,8 @@ public sealed class TaskItemUseCasesIntegrationTests : IClassFixture<MySqlTaskMa
     private static async Task ChangeStatusOperation(long createdId, UnitOfWork<TaskManagerDbContext> unitOfWork, TaskItemRepository repository)
     {
         // Arrange
-        var changeStatusHandler = new ChangeStatusTaskItemCommandHandler(repository, unitOfWork);
+        var logger = new Mock<ILogger<ChangeStatusTaskItemCommandHandler>>();
+        var changeStatusHandler = new ChangeStatusTaskItemCommandHandler(logger.Object, repository, unitOfWork);
 
         // Act
         var statusResult = await changeStatusHandler.HandleAsync(new ChangeStatusTaskItemCommand(createdId));
