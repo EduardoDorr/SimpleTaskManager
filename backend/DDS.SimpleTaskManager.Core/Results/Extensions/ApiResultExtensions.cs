@@ -5,7 +5,6 @@ using DDS.SimpleTaskManager.Core.Results.Base;
 using DDS.SimpleTaskManager.Core.Results.Errors;
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DDS.SimpleTaskManager.Core.Results.Extensions;
@@ -99,5 +98,5 @@ public static class ApiResultExtensions
             ErrorType.NotFound => "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
             ErrorType.Conflict => "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.8",
             _ => "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1",
-        };    
+        };
 }

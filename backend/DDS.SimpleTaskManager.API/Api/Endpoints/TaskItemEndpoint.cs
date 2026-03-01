@@ -1,4 +1,6 @@
-﻿using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
+﻿using System.Net;
+
+using DDS.SimpleTaskManager.API.Application.TaskItems.CancelTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.ChangeStatusTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.CreateTaskItem;
 using DDS.SimpleTaskManager.API.Application.TaskItems.GetTaskItems;
@@ -28,8 +30,8 @@ public static class TaskItemEndpoint
             return result.ToApiResult().ToResult();
         })
         .Produces<ApiResult<PaginationResult<TaskItemViewModel>>>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status500InternalServerError);
+        .Produces<ApiResult>(StatusCodes.Status400BadRequest)
+        .Produces<ApiResult>(StatusCodes.Status500InternalServerError);
 
         group.MapPost("/", async (
             CreateTaskItemCommand command,
@@ -37,11 +39,11 @@ public static class TaskItemEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await service.HandleAsync(command, cancellationToken);
-            return result.ToApiResult(System.Net.HttpStatusCode.Created).ToResult();
+            return result.ToApiResult(HttpStatusCode.Created).ToResult();
         })
         .Produces<ApiResult<long>>(StatusCodes.Status201Created)
-        .Produces(StatusCodes.Status400BadRequest)
-        .Produces(StatusCodes.Status500InternalServerError);
+        .Produces<ApiResult>(StatusCodes.Status400BadRequest)
+        .Produces<ApiResult>(StatusCodes.Status500InternalServerError);
 
         group.MapPatch("/{id}/status", async (
             long id,
@@ -49,11 +51,11 @@ public static class TaskItemEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await service.HandleAsync(new(id), cancellationToken);
-            return result.ToApiResult().ToResult();
+            return result.ToApiResult(HttpStatusCode.OK).ToResult();
         })
-        .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status500InternalServerError);
+        .Produces<ApiResult>(StatusCodes.Status200OK)
+        .Produces<ApiResult>(StatusCodes.Status404NotFound)
+        .Produces<ApiResult>(StatusCodes.Status500InternalServerError);
 
         group.MapDelete("/{id}", async (
             long id,
@@ -61,11 +63,11 @@ public static class TaskItemEndpoint
             CancellationToken cancellationToken) =>
         {
             var result = await service.HandleAsync(new(id), cancellationToken);
-            return result.ToApiResult().ToResult();
+            return result.ToApiResult(HttpStatusCode.OK).ToResult();
         })
-        .Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound)
-        .Produces(StatusCodes.Status500InternalServerError);
+        .Produces<ApiResult>(StatusCodes.Status200OK)
+        .Produces<ApiResult>(StatusCodes.Status404NotFound)
+        .Produces<ApiResult>(StatusCodes.Status500InternalServerError);
 
         return app;
     }
