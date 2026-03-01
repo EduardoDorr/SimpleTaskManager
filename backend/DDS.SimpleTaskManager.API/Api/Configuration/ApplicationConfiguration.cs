@@ -43,8 +43,9 @@ public static class ApplicationConfiguration
                 policy =>
                 {
                     policy.WithOrigins(allowedOrigins)
-                    .WithHeaders("Content-Type", "Authorization")
-                    .WithMethods("GET", "POST", "PATCH", "DELETE");
+                          .WithHeaders("Content-Type", "Authorization", "X-Correlation-Id")
+                          .WithExposedHeaders("X-Correlation-Id")
+                          .WithMethods("GET", "POST", "PATCH", "DELETE");
                 });
         });
 
