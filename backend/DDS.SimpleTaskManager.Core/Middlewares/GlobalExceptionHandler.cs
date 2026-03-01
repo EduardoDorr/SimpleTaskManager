@@ -12,6 +12,7 @@ namespace DDS.SimpleTaskManager.Core.Middlewares;
 
 public sealed class GlobalExceptionHandler : IExceptionHandler
 {
+    private const string CorrelationIdHeader = "X-Correlation-Id";
     private readonly ILogger<GlobalExceptionHandler> _logger;
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
@@ -24,10 +25,15 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(
-            exception,
-            "Exception occurred: {Message}",
-            exception.Message);
+        var correlationId = httpContext.TraceIdentifier;
+
+        using (_logger.BeginScope(new Dictionary<string, object> { ["CorrelationId"] = correlationId }))
+        {
+            _logger.LogError(
+                exception,
+                "Exception occurred: {Message}",
+                exception.Message);
+        }
 
         var errors =
             new List<IError>
@@ -42,9 +48,11 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
             new ApiResult(
                 HttpStatusCode.InternalServerError,
                 errors.ToApiError())
+            .AddInfo(new ApiInfo("CorrelationId", correlationId))
             .ToActionResult();
 
         httpContext.Response.StatusCode = result.StatusCode!.Value;
+        httpContext.Response.Headers[CorrelationIdHeader] = correlationId;
 
         await httpContext.Response
             .WriteAsJsonAsync(result.Value, cancellationToken);
