@@ -38,7 +38,7 @@ export function ConfirmDialog({
           <DialogContentText>{description}</DialogContentText>
         </DialogContent>
       ) : null}
-      <DialogActions>
+      <DialogActions sx={{ mb: 2, mr: 2 }}>
         <Button disabled={loading} onClick={onCancel}>
           {cancelLabel}
         </Button>

@@ -106,7 +106,7 @@ export function CreateTaskModal({ open, loading = false, onClose, onCreate }: Cr
           />
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ mb: 2 }}>
+      <DialogActions sx={{ mb: 2, mr: 2 }}>
         <Button 
           disabled={loading}
           onClick={onClose}
