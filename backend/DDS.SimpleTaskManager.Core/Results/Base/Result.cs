@@ -24,8 +24,8 @@ public class Result : ResultBase
 
     public static Result Fail(IError error) => new Result(error);
     public static Result Fail(IEnumerable<IError> errors) => new Result(errors);
-    public static Result<TValue> Fail<TValue>(IError error) => Result<TValue>.Fail<TValue>(error);
-    public static Result<TValue> Fail<TValue>(IEnumerable<IError> errors) => Result<TValue>.Fail<TValue>(errors);
+    public static Result<TValue> Fail<TValue>(IError error) => Result<TValue>.Fail(error);
+    public static Result<TValue> Fail<TValue>(IEnumerable<IError> errors) => Result<TValue>.Fail(errors);
 }
 
 public class Result<TValue> : ResultBase<TValue>
@@ -48,7 +48,7 @@ public class Result<TValue> : ResultBase<TValue>
         AddErrors(errors);
     }
 
-    public static Result<TValue> Ok<TValue>(TValue value) => new Result<TValue>(value);
-    public static Result<TValue> Fail<TValue>(IError error) => new Result<TValue>(error);
-    public static Result<TValue> Fail<TValue>(IEnumerable<IError> errors) => new Result<TValue>(errors);
+    public static Result<TValue> Ok(TValue value) => new Result<TValue>(value);
+    public static Result<TValue> Fail(IError error) => new Result<TValue>(error);
+    public static Result<TValue> Fail(IEnumerable<IError> errors) => new Result<TValue>(errors);
 }
