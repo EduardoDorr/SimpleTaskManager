@@ -166,6 +166,18 @@ cd frontend/SimpleTaskManager
 npm run build
 ```
 
+Frontend unit/component tests:
+```powershell
+cd frontend/SimpleTaskManager
+npm run test
+```
+
+Frontend coverage report:
+```powershell
+cd frontend/SimpleTaskManager
+npm run test:coverage
+```
+
 ## Notes For Reviewers
 This submission prioritizes:
 - Clean architecture and separation of concerns
