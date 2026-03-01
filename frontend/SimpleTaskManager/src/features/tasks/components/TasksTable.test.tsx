@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { renderWithProviders } from "@/test/renderWithProviders";
 import { TasksTable } from "./TasksTable";
+import type { ReactNode } from "react";
 
 vi.mock("@mui/x-data-grid", () => {
   return {
@@ -77,7 +77,7 @@ describe("TasksTable", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Toggle status for Task A" }));
+    await user.click(screen.getByRole("checkbox", { name: "Toggle status for Task A" }));
     await user.click(screen.getByRole("button", { name: "Delete Task A" }));
     await user.click(screen.getByRole("button", { name: "Next page" }));
 
@@ -113,7 +113,7 @@ describe("TasksTable", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Toggle status for Task A" })).toBeDisabled();
+    expect(screen.getByRole("checkbox", { name: "Toggle status for Task A" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Delete Task A" })).toBeDisabled();
   });
 });

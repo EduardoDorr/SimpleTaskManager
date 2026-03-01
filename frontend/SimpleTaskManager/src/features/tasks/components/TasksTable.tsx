@@ -1,7 +1,7 @@
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlinedBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
-import { Box, Chip, IconButton, Paper, Stack, Tooltip } from "@mui/material";
+import { Box, Checkbox, Chip, IconButton, Paper, Stack, Tooltip } from "@mui/material";
 import { DataGrid, type GridColDef, type GridPaginationModel } from "@mui/x-data-grid";
 import { formatDate, formatDateTime } from "@/shared/utils/dateFormat";
 import { surfaceCardSx } from "@/shared/styles/surfaceCards";
@@ -108,19 +108,21 @@ export function TasksTable({
         <Stack direction="row" justifyContent="flex-end" spacing={0.5} sx={{ width: "100%" }}>
           <Tooltip title="Toggle status">
             <span>
-              <IconButton
-                aria-label={`Toggle status for ${params.row.title}`}
+              <Checkbox
                 color="primary"
                 disabled={loading || togglingTaskId === params.row.id || deletingTaskId === params.row.id}
-                onClick={() => onToggleStatus(params.row.id)}
+                icon={<CheckBoxOutlinedBlankIcon fontSize="small" />}
+                checkedIcon={<CheckBoxIcon fontSize="small" />}
+                checked={params.row.status === "Completed"}
+                onChange={() => onToggleStatus(params.row.id)}
+                onClick={(event) => event.stopPropagation()}
+                slotProps={{
+                  input: {
+                    "aria-label": `Toggle status for ${params.row.title}`,
+                  },
+                }}
                 size="small"
-              >
-                {params.row.status === "Backlog" ? (
-                  <CheckCircleOutlineRoundedIcon fontSize="small" />
-                ) : (
-                  <AutorenewRoundedIcon fontSize="small" />
-                )}
-              </IconButton>
+              />
             </span>
           </Tooltip>
 

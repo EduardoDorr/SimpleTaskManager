@@ -50,6 +50,14 @@ export function MainLayout() {
             <MenuRoundedIcon />
           </IconButton>
           <Typography fontWeight={600} variant="subtitle1">
+            <Box
+              component="img"
+              src="/logo.svg"
+              alt="Task Management Logo"
+              width={24}
+              height={24}
+              sx={{ mr: 1, verticalAlign: "middle" }}
+            />
             Task Management
           </Typography>
         </Toolbar>
